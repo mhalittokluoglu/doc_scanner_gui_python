@@ -9,7 +9,7 @@ DEPENDENCIES
 imagemagick
 poppler-utils
 opencv-python
-tkinter python
+tk-python
 
 $ sudo apt install imagemagick
 
