@@ -176,8 +176,8 @@ class GUI_App:
         w2 = self.x_cor[2]-self.x_cor[3]
         wdth = max(w1,w2)
 
-        h1 = self.y_cor[3]-self.x_cor[0]
-        h2 = self.x_cor[2]-self.x_cor[1]
+        h1 = self.y_cor[3]-self.y_cor[0]
+        h2 = self.y_cor[2]-self.y_cor[1]
         hgth = max(h1,h2)
         pts1 = np.float32([[0,0],[wdth,0],[wdth,hgth],[0,hgth]])
         pts0 = np.zeros([4,2],dtype = 'float32')
