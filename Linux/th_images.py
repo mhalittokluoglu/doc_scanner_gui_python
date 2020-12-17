@@ -4,6 +4,7 @@ import cv2
 import os
 import numpy as np
 from tkinter import messagebox
+import img2pdf
 class GUI_App:
     def __init__(self,win):
 
@@ -114,13 +115,13 @@ class GUI_App:
 
     def convert2pdf_func(self):
         th_images = os.listdir('./TH_Images/')
+        i = 0
+        for image in th_images:
+            th_images[i] =  './TH_Images/'+ th_images[i]
+            i += 1
         th_images.sort()
-        convert_line = 'convert '
-        for image_name in th_images:
-            convert_line += './TH_Images/'+image_name+' '
-
-        convert_line += 'TH_Images.pdf'
-        os.system(convert_line)
+        with open('./TH_Images.pdf','wb') as f:
+            f.write(img2pdf.convert(th_images))
 
     def del_th_images_func(self):
         os.system(self.del_th_images)

@@ -2,22 +2,33 @@ This is a GUI document scanner program.
 
 FOR LINUX:
 
-DEPENDENCIES
 
-imagemagick poppler-utils opencv-python tk-python
+You can create a virtualenv
 
-$ sudo apt install imagemagick
+$ sudo apt install virtualenv
 
-$ sudo apt install poppler-utils
+$ virtualenv env1
 
-$ sudo apt install python3-opencv
+This will create a virtual python environment
 
-$ sudo apt install python3-tk
+$ source env1/bin/activate
 
-or $ pip3 install opencv-python
+Now navigate to Linux Folder
 
-$ pip3 install tk
+$ pip install -r requirements.txt
 
-In order to start the program run the scanner.py
+After the installation you can run the program:
 
-$ python3 scanner.py
+$ python scanner_program.py
+
+and for th_images:
+
+$ python th_images.py
+
+
+FOR WINDOWS:
+
+
+You can create a virtualenv and do the same things in Windows directory.
+
+Alternatively,  you can run the executable file directly from Win_executable directory. You do not need to install python for running exe files.
