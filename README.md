@@ -32,3 +32,6 @@ FOR WINDOWS:
 You can create a virtualenv and do the same things in Windows directory.
 
 Alternatively,  you can run the executable file directly from Win_executable directory. You do not need to install python for running exe files.
+
+Video about program (In Turkish):
+https://youtu.be/LY9MrLlYdY0
