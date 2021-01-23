@@ -28,6 +28,9 @@ class GUI_App:
         self.error_photos = []
 
 
+        self.check_a4 = False
+        self.check_var = tk.IntVar()
+
 
         main_frame = tk.Frame(win)
         photo_frame = tk.Frame(main_frame)
@@ -59,6 +62,7 @@ class GUI_App:
         self.save_all_bttn = tk.Button(right_frame,text = 'Try To Crop All Images',command = self.save_them_all)
         self.error_label = tk.Label(right_frame,text = '')
         self.convert_pdf_bttn = tk.Button(right_frame,text = 'Convert Cropped Images To PDF',command = self.convert2pdf_func)
+        self.chk_a4 = tk.Checkbutton(right_frame,text = 'A4 Format',variable = self.check_var,onvalue = 1,offvalue=0,command = self.check_changed)
         self.del_cr_images_bttn = tk.Button(right_frame,text = 'Delete Cropped Images',command = self.del_cr_images)
         self.open_th_program_bttn = tk.Button(right_frame,text = 'Open TH Program',command = self.open_th_program)
 
@@ -82,8 +86,9 @@ class GUI_App:
         self.save_all_bttn.grid(row = 9, column = 0, columnspan = 2)
         self.error_label.grid(row = 10, column = 0, columnspan = 2)
         self.convert_pdf_bttn.grid(row = 11, column = 0, columnspan = 2)
-        self.del_cr_images_bttn.grid(row = 12, column = 0, columnspan = 2)
-        self.open_th_program_bttn.grid(row = 13, column = 0, columnspan = 2)
+        self.chk_a4.grid(row = 12,column = 0, columnspan = 2)
+        self.del_cr_images_bttn.grid(row = 13, column = 0, columnspan = 2)
+        self.open_th_program_bttn.grid(row = 14, column = 0, columnspan = 2)
 
     def get_Position(self,event):
         self.x_cor1,self.y_cor1 = event.x,event.y
@@ -214,6 +219,12 @@ class GUI_App:
         else:
             self.error_label['text'] = 'No error'
 
+    def check_changed(self):
+        if self.check_var.get() == 1:
+            self.check_a4 = True
+        else:
+            self.check_a4 = False
+
 
     def convert2pdf_func(self):
         cropped_images = os.listdir('./Cropped_images/')
@@ -222,8 +233,14 @@ class GUI_App:
             cropped_images[i] =  './Cropped_images/'+ cropped_images[i]
             i += 1
         cropped_images.sort()
-        with open('./Cropped_images.pdf','wb') as f:
-            f.write(img2pdf.convert(cropped_images))
+        if self.check_a4 == True:
+            a4inpt = (img2pdf.mm_to_pt(210),img2pdf.mm_to_pt(297))
+            layout_fun = img2pdf.get_layout_fun(a4inpt)
+            with open('./Cropped_images.pdf','wb') as f:
+                f.write(img2pdf.convert(cropped_images,layout_fun=layout_fun))
+        else:
+            with open('./Cropped_images.pdf','wb') as f:
+                f.write(img2pdf.convert(cropped_images))
 
 
 
