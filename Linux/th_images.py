@@ -16,6 +16,8 @@ class GUI_App:
         img1 = Image.fromarray(cv_img);
         self.empty_image= ImageTk.PhotoImage(image = img1)
 
+        self.check_a4 = False
+        self.check_var = tk.IntVar()
 
 
         main_frame = tk.Frame(win)
@@ -43,6 +45,7 @@ class GUI_App:
         self.save_bttn = tk.Button(right_frame,text='Save the Thresholded Image',command = self.save_image)
         self.save_all_bttn = tk.Button(right_frame,text = 'Try To Threshold All Images',command = self.save_them_all)
         self.convert_pdf_bttn = tk.Button(right_frame,text = 'Convert Thresholded Images To PDF',command = self.convert2pdf_func)
+        self.chk_a4 = tk.Checkbutton(right_frame,text = 'A4 Format',variable = self.check_var,onvalue = 1,offvalue=0,command = self.check_changed)
         self.del_th_images_bttn = tk.Button(right_frame,text = 'Delete TH Images',command = self.del_th_images_func)
 
         self.counter_entry.bind("<Return>", self.onReturn)
@@ -61,7 +64,8 @@ class GUI_App:
         self.save_bttn.grid(row = 5, column = 0, columnspan = 2)
         self.save_all_bttn.grid(row = 6, column = 0, columnspan = 2)
         self.convert_pdf_bttn.grid(row = 7, column = 0, columnspan = 2)
-        self.del_th_images_bttn.grid(row = 8, column = 0, columnspan = 2)
+        self.chk_a4.grid(row = 8,column = 0, columnspan = 2)
+        self.del_th_images_bttn.grid(row = 9, column = 0, columnspan = 2)
 
     def open_images(self):
         self.images_names = os.listdir('./Cropped_images/')
@@ -73,16 +77,21 @@ class GUI_App:
         self.show_image()
 
 
+    def th_bgr_img(self,img,a,c):
+        b,g,r = cv2.split(img)
+        th_b = cv2.adaptiveThreshold(b,255,cv2.ADAPTIVE_THRESH_MEAN_C,cv2.THRESH_BINARY,a,c)
+        th_g = cv2.adaptiveThreshold(g,255,cv2.ADAPTIVE_THRESH_MEAN_C,cv2.THRESH_BINARY,a,c)
+        th_r = cv2.adaptiveThreshold(r,255,cv2.ADAPTIVE_THRESH_MEAN_C,cv2.THRESH_BINARY,a,c)
+        img2 = cv2.merge((th_b,th_g,th_r))
+        return img2
+
     def show_image(self):
         self.current_image = cv2.imread('./Cropped_images/'+self.images_names[self.image_counter])
         current_image_gray = cv2.cvtColor(self.current_image,cv2.COLOR_BGR2GRAY)
         resized_image = cv2.resize(self.current_image,(480,640))
-        resized_copy = resized_image.copy()
-        resized_copy = cv2.cvtColor(resized_copy,cv2.COLOR_BGR2GRAY)
-        self.th1 = cv2.adaptiveThreshold(resized_copy,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY,self.a,self.c)
-        self.th2 = cv2.adaptiveThreshold(current_image_gray,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY,self.a,self.c)
-        cv_img = cv2.cvtColor(self.th1,cv2.COLOR_BGR2RGB)
-        img = Image.fromarray(cv_img)
+        self.th1 = self.th_bgr_img(resized_image,self.a,self.c)
+        self.th2 = self.th_bgr_img(self.current_image,self.a,self.c)
+        img = Image.fromarray(self.th1)
         self.c_image_copy = ImageTk.PhotoImage(image = img)
         self.photo_label.imgtk = self.c_image_copy
         self.photo_label.configure(image = self.c_image_copy)
@@ -112,6 +121,11 @@ class GUI_App:
             self.save_image()
             self.next_image_func()
 
+    def check_changed(self):
+        if self.check_var.get() == 1:
+            self.check_a4 = True
+        else:
+            self.check_a4 = False
 
     def convert2pdf_func(self):
         th_images = os.listdir('./TH_Images/')
@@ -120,8 +134,14 @@ class GUI_App:
             th_images[i] =  './TH_Images/'+ th_images[i]
             i += 1
         th_images.sort()
-        with open('./TH_Images.pdf','wb') as f:
-            f.write(img2pdf.convert(th_images))
+        if self.check_a4 == True:
+            a4inpt = (img2pdf.mm_to_pt(210),img2pdf.mm_to_pt(297))
+            layout_fun = img2pdf.get_layout_fun(a4inpt)
+            with open('./TH_Images.pdf','wb') as f:
+                f.write(img2pdf.convert(th_images,layout_fun=layout_fun))
+        else:
+            with open('./TH_Images.pdf','wb') as f:
+                f.write(img2pdf.convert(th_images))
 
     def del_th_images_func(self):
         os.system(self.del_th_images)
