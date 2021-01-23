@@ -5,6 +5,7 @@ import cv2
 import os
 import numpy as np
 import img2pdf
+from pikepdf import _cpphelpers
 from tkinter import messagebox
 class GUI_App:
     def __init__(self,win):
